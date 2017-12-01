@@ -49,63 +49,59 @@ public class Main
         }
     }
 
-    public String func3a(){
+    public String getTopName(){
         return execute("match (n:Person) return n.name order by n.name");
     }
 
-    public String func3b(){
+    public String getNameMale(){
         return execute("match (p:Person) where p.sex=\"male\" return p.name, p.age order by p.age desc");
     }
 
-    public String func3c(String name){
+    public String getFriends(String name){
         return executeWithNameParam("match (node:Person)<-[:FRIEND]-(n) where node.name = {x} return n.name order by n.name", name);
     }
 
-    public String func3d(String name){
+    public String getFriendsFriends(String name){
         return executeWithNameParam("match (node:Person)<-[:FRIEND]-(n)<-[:FRIEND]-(f) where node.name = {x} return f.name order by f.name", name);
     }
 
-    public String func3e(){
+    public String getNameAndCountFriends(){
         return execute("MATCH (n:Person)<-[:FRIEND]-(f) RETURN n.name, count(f) as counter order by n.name");
     }
 
-    public String func3f(){
+    public String getGroups(){
         return execute("match (g:Group) return g.name order by g.name");
     }
 
-    public String func3g(String name) {
+    public String getGroupsByName(String name) {
         return executeWithNameParam("match (g:Group)<-[:SUBSCRIBER]-(p:Person) where p.name = {x} return g.name order by g.name", name);
     }
 
-    public String func3h(){
+    public String getGroupsAndMemberCount(){
         return execute("match (g:Group)<-[:SUBSCRIBER]-(p:Person) return g.name, count(p) order by count(p) desc");
     }
 
-    public String func3i(){
-        return execute("match (g:Group)<-[:SUBSCRIBER]-(p:Person) return p.name, count(g) order by count(g) desc");
-    }
-
-    public String func3j(String name){
+    public String getCountGroupsFriendsFriends(String name){
         return executeWithNameParam("match (p:Person)<-[:FRIEND]-(f:Person)<-[:FRIEND]-(ff:Person)-[:SUBSCRIBER]->(g:Group) where p.name={x} return count(g)", name);
     }
 
-    public String func4a(String name){
+    public String getPosts(String name){
         return executeWithNameParam("match (n) where n.name={x} return n.posts", name);
     }
 
-    public String func4b(int num){
+    public String getPostsGtNum(int num){
         return executeWithIntParam("match (n:Person) return n.name, filter(row in n.posts where length(row)>{x})", num);
     }
 
-    public String func4c(){
+    public String getNameAndPosts(){
         return execute("match (n:Person) return n.name, size(n.posts) order by size(n.posts) desc");
     }
 
-    public String func4d(String name){
+    public String getPostsFriendsFriends(String name){
         return executeWithNameParam("match (n:Person)<-[:FRIEND]-(f:Person)<-[:FRIEND]-(ff:Person) where n.name={x} return ff.name, ff.posts", name);
     }
 
-    public String func4i(){
+    public String getPostsSort(){
         return execute("match (p:Person) with (reduce(total = 0, row in p.posts | total + length(row)))/size(p.posts) as num, p.name as name return name, num order by num desc");
     }
 
@@ -145,10 +141,6 @@ public class Main
         return arr.toString();
     }
 
-    public void printResult(String result){
-        System.out.println(result);
-    }
-
     public static void close() {
         driver.close();
     }
@@ -162,14 +154,15 @@ public class Main
                 tx.success();
             }
         }
-        addPerson("Grishka", 10, 1, "male", new String[]{"gggg", "gggggggg", "gg", "ggggg", "ggggggg"});
-        addPerson("Andriy", 23, 2, "male", new String[]{"aaaaaaa", "aa", "aaaaa"});
-        addPerson("Bogus", 20, 3, "male", new String[]{"bbbbbbbbb", "b"});
-        addPerson("Taras", 19, 4, "male", new String[]{"tttttttttttt", "tttttttttttt", "ttt", "tttttt"});
-        addPerson("Artem", 23, 5, "male", new String[]{"aaaaaaaa", "aaaaaaaaaaaaaa", "aaaaaaaaaaa", "aa", "aaaa"});
-        addPerson("Vitia", 5, 6, "male", new String[]{"vvvv", "vv", "vvvvvvvvvvv", "vvvvv", "vv", "vvvvvvvv"});
-        addPerson("Liza", 22, 7, "female", new String[]{"llll", "lll", "llllllll"});
-        addPerson("Nazar", 20, 8, "male", new String[]{"nn", "n"});
+        addPerson("Tom", 21, 1, "male", new String[]{"Hello Word!", "Raund", "Versus", "Spoon", "Cup"});
+        addPerson("Lucy", 23, 2, "female", new String[]{"Eat", "Instagram", "Village"});
+        addPerson("Max", 20, 3, "male", new String[]{"Cars my love", "Just do it"});
+        addPerson("Olivia", 19, 4, "female", new String[]{"Mousee kek", "I don'n know", "Happy birthday"});
+        addPerson("Lucas", 23, 5, "male", new String[]{"Lamp don't blink", "Calendar"});
+        addPerson("Victor", 5, 6, "male", new String[]{"Programming", "Java", "Python", "Stack", "Linux"});
+        addPerson("Logan", 22, 7, "male", new String[]{"Rochomsha", "Water", "Orange"});
+        addPerson("Torvald", 20, 8, "male", new String[]{"Creator", "Operation system"});
+
         addFriendRelation(1,3);
         addFriendRelation(2,3);
         addFriendRelation(1,8);
@@ -184,17 +177,19 @@ public class Main
         addFriendRelation(6,2);
         addFriendRelation(2,6);
         addFriendRelation(6,1);
-        addGroup("KPI", 101);
-        addGroup("FIOT", 102);
+
+        addGroup("Programing", 101);
+        addGroup("Coffee", 102);
+
         addGroupRelation(101, 1);
         addGroupRelation(101, 2);
         addGroupRelation(101, 3);
         addGroupRelation(101, 4);
-        addGroupRelation(101, 5);
+        addGroupRelation(101, 6);
         addGroupRelation(101, 7);
         addGroupRelation(101, 8);
         addGroupRelation(102, 1);
-        addGroupRelation(102, 3);
+        addGroupRelation(102, 6);
         addGroupRelation(102, 4);
         addGroupRelation(102, 7);
     }

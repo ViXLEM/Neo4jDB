@@ -5,102 +5,102 @@ public class MainTest {
     private Main example = new Main();
 
     @Test
-    public void test3a()
+    public void getTopName()
     {
-        String expected = "[[\"Andriy\"], [\"Artem\"], [\"Bogus\"], [\"Grishka\"], [\"Liza\"], [\"Nazar\"], [\"Taras\"], [\"Vitia\"]]";
-        assertEquals(example.func3a(), expected);
+        String expected = "[[\"Logan\"], [\"Lucas\"], [\"Lucy\"], [\"Max\"], [\"Olivia\"], [\"Tom\"], [\"Torvald\"], [\"Victor\"]]";
+        assertEquals(example.getTopName(), expected);
     }
 
     @Test
-    public void test3b()
+    public void getNameMale()
     {
-        String expected = "[[\"Andriy\", 23], [\"Artem\", 23], [\"Bogus\", 20], [\"Nazar\", 20], [\"Taras\", 19], [\"Grishka\", 10], [\"Vitia\", 5]]";
-        assertEquals(example.func3b(), expected);
+        String expected = "[[\"Lucas\", 23], [\"Logan\", 22], [\"Tom\", 21], [\"Max\", 20], [\"Torvald\", 20], [\"Victor\", 5]]";
+        assertEquals(example.getNameMale(), expected);
     }
 
     @Test
-    public void test3c()
+    public void getFriends()
     {
-        String expected = "[[\"Andriy\"], [\"Grishka\"]]";
-        assertEquals(example.func3c("Bogus"), expected);
+        String expected = "[[\"Lucy\"], [\"Tom\"]]";
+        assertEquals(example.getFriends("Victor"), expected);
     }
 
     @Test
-    public void test3d()
+    public void getFriendsFriends()
     {
-        String expected = "[[\"Bogus\"], [\"Bogus\"], [\"Nazar\"], [\"Vitia\"], [\"Vitia\"]]";
-        assertEquals(example.func3d("Bogus"), expected);
+        String expected = "[[\"Max\"], [\"Max\"], [\"Torvald\"], [\"Victor\"], [\"Victor\"]]";
+        assertEquals(example.getFriendsFriends("Victor"), expected);
     }
 
     @Test
-    public void test3e()
+    public void getNameAndCountFriends()
     {
-        String expected = "[[\"Andriy\", 2], [\"Artem\", 2], [\"Bogus\", 2], [\"Grishka\", 3], [\"Liza\", 1], [\"Nazar\", 1], [\"Taras\", 1], [\"Vitia\", 2]]";
-        assertEquals(example.func3e(), expected);
+        String expected = "[[\"Logan\", 1], [\"Lucas\", 2], [\"Lucy\", 2], [\"Max\", 2], [\"Olivia\", 1], [\"Tom\", 3], [\"Torvald\", 1], [\"Victor\", 2]]";
+        assertEquals(example.getNameAndCountFriends(), expected);
     }
 
     @Test
-    public void test3f()
+    public void getGroups()
     {
-        String expected = "[[\"FIOT\"], [\"KPI\"]]";
-        assertEquals(example.func3f(), expected);
+        String expected = "[[\"Coffee\"], [\"Programing\"]]";
+        assertEquals(example.getGroups(), expected);
     }
 
     @Test
-    public void test3g()
+    public void getGroupsByName()
     {
-        String expected = "[[\"FIOT\"], [\"KPI\"]]";
-        assertEquals(example.func3g("Bogus"), expected);
+        String expected = "[[\"Coffee\"], [\"Programing\"]]";
+        assertEquals(example.getGroupsByName("Victor"), expected);
     }
 
     @Test
-    public void test3h()
+    public void getGroupsAndMemberCount()
     {
-        String expected = "[[\"KPI\", 7], [\"FIOT\", 4]]";
-        assertEquals(example.func3h(), expected);
+        String expected = "[[\"Programing\", 7], [\"Coffee\", 4]]";
+        assertEquals(example.getGroupsAndMemberCount(), expected);
     }
 
 
     @Test
-    public void test3j()
+    public void getCountGroupsFriendsFriends()
     {
-        String expected = "[[5]]";
-        assertEquals(example.func3j("Bogus"), expected);
+        String expected = "[[7]]";
+        assertEquals(example.getCountGroupsFriendsFriends("Victor"), expected);
     }
 
     @Test
-    public void test4a()
+    public void getPosts()
     {
-        String expected = "[[[\"bbbbbbbbb\", \"b\"]]]";
-        assertEquals(example.func4a("Bogus"), expected);
+        String expected = "[[[\"Programming\", \"Java\", \"Python\", \"Stack\", \"Linux\"]]]";
+        assertEquals(example.getPosts("Victor"), expected);
     }
 
     @Test
-    public void test4b()
+    public void getPostsGtNum()
     {
-        String expected = "[[\"Grishka\", []], [\"Andriy\", []], [\"Bogus\", []], [\"Taras\", [\"tttttttttttt\", \"tttttttttttt\"]], [\"Artem\", [\"aaaaaaaaaaaaaa\", \"aaaaaaaaaaa\"]], [\"Vitia\", [\"vvvvvvvvvvv\"]], [\"Liza\", []], [\"Nazar\", []]]";
-        assertEquals(example.func4b(10), expected);
+        String expected = "[[\"Tom\", [\"Hello Word!\"]], [\"Lucy\", []], [\"Max\", [\"Cars my love\"]], [\"Olivia\", [\"I don'n know\", \"Happy birthday\"]], [\"Lucas\", [\"Lamp don't blink\"]], [\"Victor\", [\"Programming\"]], [\"Logan\", []], [\"Torvald\", [\"Operation system\"]]]";
+        assertEquals(example.getPostsGtNum(10), expected);
     }
 
     @Test
-    public void test4c()
+    public void getNameAndPosts()
     {
-        String expected = "[[\"Vitia\", 6], [\"Grishka\", 5], [\"Artem\", 5], [\"Taras\", 4], [\"Andriy\", 3], [\"Liza\", 3], [\"Bogus\", 2], [\"Nazar\", 2]]";
-        assertEquals(example.func4c(), expected);
+        String expected = "[[\"Tom\", 5], [\"Victor\", 5], [\"Lucy\", 3], [\"Olivia\", 3], [\"Logan\", 3], [\"Max\", 2], [\"Lucas\", 2], [\"Torvald\", 2]]";
+        assertEquals(example.getNameAndPosts(), expected);
     }
 
     @Test
-    public void test4d()
+    public void getPostsFriendsFriends()
     {
-        String expected = "[[\"Vitia\", [\"vvvv\", \"vv\", \"vvvvvvvvvvv\", \"vvvvv\", \"vv\", \"vvvvvvvv\"]], [\"Bogus\", [\"bbbbbbbbb\", \"b\"]], [\"Vitia\", [\"vvvv\", \"vv\", \"vvvvvvvvvvv\", \"vvvvv\", \"vv\", \"vvvvvvvv\"]], [\"Nazar\", [\"nn\", \"n\"]], [\"Bogus\", [\"bbbbbbbbb\", \"b\"]]]";
-        assertEquals(example.func4d("Bogus"), expected);
+        String expected = "[[\"Victor\", [\"Programming\", \"Java\", \"Python\", \"Stack\", \"Linux\"]], [\"Max\", [\"Cars my love\", \"Just do it\"]], [\"Victor\", [\"Programming\", \"Java\", \"Python\", \"Stack\", \"Linux\"]], [\"Torvald\", [\"Creator\", \"Operation system\"]], [\"Max\", [\"Cars my love\", \"Just do it\"]]]";
+        assertEquals(example.getPostsFriendsFriends("Victor"), expected);
     }
 
     @Test
-    public void test4i()
+    public void getPostsSort()
     {
-        String expected = "[[\"Taras\", 8], [\"Artem\", 7], [\"Grishka\", 5], [\"Bogus\", 5], [\"Vitia\", 5], [\"Liza\", 5], [\"Andriy\", 4], [\"Nazar\", 1]]";
-        assertEquals(example.func4i(), expected);
+        String expected = "[[\"Olivia\", 12], [\"Lucas\", 12], [\"Max\", 11], [\"Torvald\", 11], [\"Tom\", 6], [\"Lucy\", 6], [\"Victor\", 6], [\"Logan\", 6]]";
+        assertEquals(example.getPostsSort(), expected);
     }
 
 }
