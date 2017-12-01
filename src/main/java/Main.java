@@ -11,7 +11,7 @@ public class Main
     private static void addPerson(String name, int Age, int Id, String sex, String[] posts) {
         try (Session session = driver.session()) {
             try (Transaction tx = session.beginTransaction()) {
-                tx.run("MERGE (" + "a:Person {name: {name}, age : {age}, id : {id}, sex: {sex}, posts: {posts}}" + ")",
+                tx.run("MERGE (a:Person {name: {name}, age : {age}, id : {id}, sex: {sex}, posts: {posts}})",
                         parameters("name", name, "age", Age, "id", Id, "sex", sex, "posts", posts));
                 tx.success();
             }
@@ -163,6 +163,9 @@ public class Main
         addPerson("Logan", 22, 7, "male", new String[]{"Rochomsha", "Water", "Orange"});
         addPerson("Torvald", 20, 8, "male", new String[]{"Creator", "Operation system"});
 
+        addGroup("Programing", 101);
+        addGroup("Coffee", 102);
+
         addFriendRelation(1,3);
         addFriendRelation(2,3);
         addFriendRelation(1,8);
@@ -177,9 +180,6 @@ public class Main
         addFriendRelation(6,2);
         addFriendRelation(2,6);
         addFriendRelation(6,1);
-
-        addGroup("Programing", 101);
-        addGroup("Coffee", 102);
 
         addGroupRelation(101, 1);
         addGroupRelation(101, 2);
