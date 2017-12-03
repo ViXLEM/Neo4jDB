@@ -8,192 +8,181 @@ import static org.neo4j.driver.v1.Values.parameters;
 
 public class Main
 {
-    public static Driver driver = null;
+    public static Driver driver;
 
-    private static void addPerson(String name, int Age, int Id, String sex, String[] posts) {
+    public static void addUser(String name, int age, int id, String sex, String[] posts) {
         try (Session session = driver.session()) {
             try (Transaction tx = session.beginTransaction()) {
-                tx.run("MERGE (a:Person {name: {name}, age : {age}, id : {id}, sex: {sex}, posts: {posts}})",
-                        parameters("name", name, "age", Age, "id", Id, "sex", sex, "posts", posts));
+                tx.run("CREATE (a:User {name: {name}, age : {age}, " +
+                                "id : {id}, sex: {sex}, posts: {posts}})",
+                        parameters("name", name, "age", age, "id", id, "sex", sex, "posts", posts));
                 tx.success();
             }
         }
     }
 
-    private static void addFriendRelation(int firstID, int secondID) {
+    public static void addGroup(String name, int id) {
+        try (Session session = driver.session()){
+            try (Transaction tx = session.beginTransaction()){
+                tx.run("CREATE (a:Group {name: {name}, id : {id}})",
+                        parameters("name", name, "id", id));
+                tx.success();
+            }
+        }
+    }
+
+    public static void addFriend(int firstUserID, int secondUserID) {
         try (Session session = driver.session()) {
             try (Transaction tx = session.beginTransaction()) {
-                tx.run("match (a{id: {x} }),(b{id: {y} }) Merge (a)-[r:FRIEND]->(b)",
-                        parameters("x", firstID, "y",secondID));
+                tx.run("MATCH (a{id: {fUser} }),(b{id: {sUser} }) MERGE (a)-[r:Friend]->(b)",
+                        parameters("fUser", firstUserID, "sUser",secondUserID));
                 tx.success();
             }
         }
     }
 
-    private static void addGroupRelation(int GroupID, int personID)
-    {
+    public static void addSubscriber(int groupID, int userID) {
         try (Session session = driver.session()){
             try (Transaction tx = session.beginTransaction()){
-                tx.run("match (a{id: {x} }),(b{id: {y} }) Merge (a)-[r: SUBSCRIBER]->(b)",
-                        parameters("y", GroupID, "x",personID));
-                tx.success();
-            }
-        }
-    }
-
-    private static void addGroup(String name, int Id) {
-        try (Session session = driver.session()){
-            try (Transaction tx = session.beginTransaction()){
-                tx.run("MERGE (a:Group {name: {x}, id : {y}})",
-                        parameters("x", name, "y", Id));
+                tx.run("MATCH (a{id: {user} }),(b{id: {group} }) MERGE (a)-[r: Subscriber]->(b)",
+                        parameters("group", groupID, "user",userID));
                 tx.success();
             }
         }
     }
 
     public String getTopName(){
-        return execute("match (n:Person) return n.name order by n.name");
+        try (Session session = driver.session()) {
+            StatementResult result = session.run("MATCH (n:User) RETURN n.name ORDER BY n.name");
+            return resultToString(result);
+        }
     }
 
     public String getNameMale(){
-        return execute("match (p:Person) where p.sex=\"male\" return p.name, p.age order by p.age desc");
+        try (Session session = driver.session()) {
+            StatementResult result = session.run("MATCH (n:User) " +
+                    "WHERE n.sex=\"male\" RETURN n.name, n.age ORDER BY n.age DESC, n.name");
+            return resultToString(result);
+        }
     }
 
     public String getFriends(String name){
-        return executeWithNameParam("match (node:Person)<-[:FRIEND]-(n) where node.name = {x} return n.name order by n.name", name);
+        try (Session session = driver.session()) {
+            StatementResult result = session.run("MATCH (node:User)<-[:Friend]-(n) " +
+                    "WHERE node.name = {param} RETURN n.name ORDER BY n.name",
+                    parameters("param", name));
+            return resultToString(result);
+        }
     }
 
     public String getFriendsFriends(String name){
-        return executeWithNameParam("match (node:Person)<-[:FRIEND]-(n)<-[:FRIEND]-(f) where node.name = {x} return f.name order by f.name", name);
+        try (Session session = driver.session()) {
+            StatementResult result = session.run("MATCH (node:User)<-[:Friend]-(n)<-[:Friend]-(f) " +
+                    "WHERE node.name = {param} RETURN f.name ORDER BY f.name",
+                    parameters("param", name));
+            return resultToString(result);
+        }
     }
 
     public String getNameAndCountFriends(){
-        return execute("MATCH (n:Person)<-[:FRIEND]-(f) RETURN n.name, count(f) as counter order by n.name");
+        try (Session session = driver.session()) {
+            StatementResult result = session.run("MATCH (n:User)<-[:Friend]-(f) " +
+                    "RETURN n.name, COUNT(f) AS counter ORDER BY n.name");
+            return resultToString(result);
+        }
     }
 
     public String getGroups(){
-        return execute("match (g:Group) return g.name order by g.name");
+        try (Session session = driver.session()) {
+            StatementResult result = session.run("MATCH (g:Group) RETURN g.name ORDER BY g.name");
+            return resultToString(result);
+        }
     }
 
     public String getGroupsByName(String name) {
-        return executeWithNameParam("match (g:Group)<-[:SUBSCRIBER]-(p:Person) where p.name = {x} return g.name order by g.name", name);
+        try (Session session = driver.session()) {
+            StatementResult result = session.run("MATCH (g:Group)<-[:Subscriber]-(u:User) " +
+                    "WHERE u.name = {param} RETURN g.name ORDER BY g.name",
+                    parameters("param", name));
+            return resultToString(result);
+        }
     }
 
     public String getGroupsAndMemberCount(){
-        return execute("match (g:Group)<-[:SUBSCRIBER]-(p:Person) return g.name, count(p) order by count(p) desc");
+        try (Session session = driver.session()) {
+            StatementResult result = session.run("MATCH (g:Group)<-[:Subscriber]-(u:User) " +
+                    "RETURN g.name, COUNT(u) ORDER BY COUNT(u) DESC");
+            return resultToString(result);
+        }
     }
 
     public String getCountGroupsFriendsFriends(String name){
-        return executeWithNameParam("match (p:Person)<-[:FRIEND]-(f:Person)<-[:FRIEND]-(ff:Person)-[:SUBSCRIBER]->(g:Group) where p.name={x} return count(g)", name);
+        try (Session session = driver.session()) {
+            StatementResult result = session.run("MATCH (u:User)<-[:Friend*2]-(f:User)-[:Subscriber]->(g:Group) " +
+                    "WHERE u.name={param} RETURN COUNT(g)",
+                    parameters("param", name));
+            return resultToString(result);
+        }
     }
 
     public String getPosts(String name){
-        return executeWithNameParam("match (n) where n.name={x} return n.posts", name);
+        try (Session session = driver.session()) {
+            StatementResult result = session.run("MATCH (n:User {name:$param}) RETURN n.posts",
+                    parameters("param", name));
+            return resultToString(result);
+        }
     }
 
     public String getPostsGtNum(int num){
-        return executeWithIntParam("match (n:Person) return n.name, filter(row in n.posts where length(row)>{x})", num);
+        try (Session session = driver.session()) {
+            StatementResult result = session.run("MATCH (n:User) " +
+                    "RETURN n.name, FILTER(row in n.posts " +
+                    "WHERE LENGTH(row)>{param}) ORDER BY n.name",
+                    parameters("param", num));
+            return resultToString(result);
+        }
+
     }
 
     public String getNameAndPosts(){
-        return execute("match (n:Person) return n.name, size(n.posts) order by size(n.posts) desc");
-    }
-
-    public String getPostsFriendsFriends(String name){
-        return executeWithNameParam("match (n:Person)<-[:FRIEND]-(f:Person)<-[:FRIEND]-(ff:Person) where n.name={x} return ff.name, ff.posts", name);
+        try (Session session = driver.session()) {
+            StatementResult result = session.run("MATCH (n:User) RETURN n.name, SIZE(n.posts) " +
+                    "ORDER BY size(n.posts) DESC, n.name");
+            return resultToString(result);
+        }
     }
 
     public String getPostsSort(){
-        return execute("match (p:Person) with (reduce(total = 0, row in p.posts | total + length(row)))/size(p.posts) as num, p.name as name return name, num order by num desc");
-    }
-
-    public static String execute(String query){
-        List<String> arr = new ArrayList<String>();
-        try (Session session = driver.session()){
-            StatementResult result = session.run(query);
-            while (result.hasNext()){
-                Record record = result.next();
-                arr.add(record.values().toString());
-            }
+        try (Session session = driver.session()) {
+            StatementResult result = session.run("MATCH (p:User) " +
+                    "WITH (reduce(total = 0, row in p.posts | total + length(row)))/size(p.posts) " +
+                    "AS num, p.name AS name " +
+                    "RETURN name, num ORDER BY num DESC, name");
+            return resultToString(result);
         }
-        return arr.toString();
     }
 
-    public static String executeWithNameParam(String query, String name){
-        List<String> arr = new ArrayList<String>();
-        try (Session session = driver.session()){
-            StatementResult result = session.run(query, parameters("x", name));
-            while (result.hasNext()){
-                Record record = result.next();
-                arr.add(record.values().toString());
-            }
+    public String getPostsFriendsFriends(String name){
+        try (Session session = driver.session()) {
+            StatementResult result = session.run("MATCH (n:User {name:$param})<-[:Friend*2]-(f:User) " +
+                            "RETURN f.name, f.posts ORDER BY f.name",
+                    parameters("param", name));
+            return resultToString(result);
         }
-        return arr.toString();
     }
 
-    public static String executeWithIntParam(String query, int num){
-        List<String> arr = new ArrayList<String>();
-        try (Session session = driver.session()){
-            StatementResult result = session.run(query, parameters("x", num));
-            while (result.hasNext()){
-                Record record = result.next();
-                arr.add(record.values().toString());
-            }
+    public static String resultToString(StatementResult result){
+        List<String> resultList = new ArrayList<>();
+        while (result.hasNext()){
+            Record record = result.next();
+            resultList.add(record.values().toString());
         }
-        return arr.toString();
-    }
-
-    public static void close() {
-        driver.close();
+        return resultList.toString();
     }
 
     public Main()
     {
-        driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "neo4j"));
-        try (Session session = driver.session()) {
-            try (Transaction tx = session.beginTransaction()) {
-                tx.run("match (n)-[r]-() DELETE n,r;");
-                tx.success();
-            }
-        }
-        addPerson("Tom", 21, 1, "male", new String[]{"Hello Word!", "Raund", "Versus", "Spoon", "Cup"});
-        addPerson("Lucy", 23, 2, "female", new String[]{"Eat", "Instagram", "Village"});
-        addPerson("Max", 20, 3, "male", new String[]{"Cars my love", "Just do it"});
-        addPerson("Olivia", 19, 4, "female", new String[]{"Mousee kek", "I don'n know", "Happy birthday"});
-        addPerson("Lucas", 23, 5, "male", new String[]{"Lamp don't blink", "Calendar"});
-        addPerson("Victor", 5, 6, "male", new String[]{"Programming", "Java", "Python", "Stack", "Linux"});
-        addPerson("Logan", 22, 7, "male", new String[]{"Rochomsha", "Water", "Orange"});
-        addPerson("Torvald", 20, 8, "male", new String[]{"Creator", "Operation system"});
-
-        addGroup("Programing", 101);
-        addGroup("Coffee", 102);
-
-        addFriendRelation(1,3);
-        addFriendRelation(2,3);
-        addFriendRelation(1,8);
-        addFriendRelation(4,5);
-        addFriendRelation(5,7);
-        addFriendRelation(1,6);
-        addFriendRelation(3,1);
-        addFriendRelation(3,2);
-        addFriendRelation(8,1);
-        addFriendRelation(5,4);
-        addFriendRelation(7,5);
-        addFriendRelation(6,2);
-        addFriendRelation(2,6);
-        addFriendRelation(6,1);
-
-        addGroupRelation(101, 1);
-        addGroupRelation(101, 2);
-        addGroupRelation(101, 3);
-        addGroupRelation(101, 4);
-        addGroupRelation(101, 6);
-        addGroupRelation(101, 7);
-        addGroupRelation(101, 8);
-        addGroupRelation(102, 1);
-        addGroupRelation(102, 6);
-        addGroupRelation(102, 4);
-        addGroupRelation(102, 7);
+        driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("login", "password"));
     }
 
 }
