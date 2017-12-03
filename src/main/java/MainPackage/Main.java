@@ -182,7 +182,7 @@ public class Main
 
     public Main()
     {
-        driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("login", "password"));
+        driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "neo4j"));
     }
 
 }
