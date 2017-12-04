@@ -39,10 +39,10 @@ public class MainTest {
         Main.addGroup("Coffee", 12);
         Main.addGroup("Music", 13);
 
+        List<Integer> friendFirstList = Arrays.asList(1,2,1,4,5,1,6,2,10,10,10,10,9,9,9);
+        List<Integer> friendSecondList = Arrays.asList(3,3,8,5,7,6,2,6,1,8,9,2,1,5,4);
 
-        List<Integer> friendFirstList = Arrays.asList(1,2,1,4,5,1,3,3,8,5,7,6,2,6,10,10,10,10,9,9,9);
-        List<Integer> friendSecondList = Arrays.asList(3,3,8,5,7,6,1,2,1,4,5,2,6,1,1,8,9,2,1,5,4);
-        for (int x = 0; x<21; x++){
+        for (int x = 0; x<15; x++){
             Main.addFriend(friendFirstList.get(x), friendSecondList.get(x));
         }
 
@@ -73,13 +73,13 @@ public class MainTest {
 
     @Test
     public void getFriendsFriends() {
-        String expected = "[[\"Alex\"], [\"Alex\"], [\"Bob\"], [\"Max\"], [\"Max\"], [\"Torvald\"], [\"Victor\"], [\"Victor\"]]";
+        String expected = "[[\"Alex\"], [\"Alex\"], [\"Bob\"], [\"Max\"], [\"Max\"], [\"Torvald\"]]";
         Assert.assertEquals(example.getFriendsFriends("Victor"), expected);
     }
 
     @Test
     public void getNameAndCountFriends() {
-        String expected = "[[\"Bob\", 1], [\"Logan\", 1], [\"Lucas\", 3], [\"Lucy\", 3], [\"Max\", 2], [\"Olivia\", 2], [\"Tom\", 5], [\"Torvald\", 2], [\"Victor\", 2]]";
+        String expected = "[[\"Alex\", 4], [\"Bob\", 4], [\"Logan\", 1], [\"Lucas\", 3], [\"Lucy\", 3], [\"Max\", 2], [\"Olivia\", 2], [\"Tom\", 5], [\"Torvald\", 2], [\"Victor\", 2]]";
         Assert.assertEquals(example.getNameAndCountFriends(), expected);
     }
 
@@ -103,7 +103,7 @@ public class MainTest {
 
     @Test
     public void getCountGroupsFriendsFriends() {
-        String expected = "[[15]]";
+        String expected = "[[11]]";
         Assert.assertEquals(example.getCountGroupsFriendsFriends("Victor"), expected);
     }
 
@@ -127,7 +127,7 @@ public class MainTest {
 
     @Test
     public void getPostsFriendsFriends() {
-        String expected = "[[\"Alex\", [\"Fireplace\", \"Moon\", \"Star\", \"Kiev\"]], [\"Alex\", [\"Fireplace\", \"Moon\", \"Star\", \"Kiev\"]], [\"Bob\", [\"Laptop\", \"Door\", \"Phone\"]], [\"Max\", [\"Cars my love\", \"Just do it\"]], [\"Max\", [\"Cars my love\", \"Just do it\"]], [\"Torvald\", [\"Creator\", \"Operation system\"]], [\"Victor\", [\"Programming\", \"Java\", \"Python\", \"Stack\", \"Linux\"]], [\"Victor\", [\"Programming\", \"Java\", \"Python\", \"Stack\", \"Linux\"]]]";
+        String expected = "[[\"Alex\", [\"Fireplace\", \"Moon\", \"Star\", \"Kiev\"]], [\"Alex\", [\"Fireplace\", \"Moon\", \"Star\", \"Kiev\"]], [\"Bob\", [\"Laptop\", \"Door\", \"Phone\"]], [\"Max\", [\"Cars my love\", \"Just do it\"]], [\"Max\", [\"Cars my love\", \"Just do it\"]], [\"Torvald\", [\"Creator\", \"Operation system\"]]]";
         Assert.assertEquals(example.getPostsFriendsFriends("Victor"), expected);
     }
 

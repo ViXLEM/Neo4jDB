@@ -34,7 +34,7 @@ public class Main
     public static void addFriend(int firstUserID, int secondUserID) {
         try (Session session = driver.session()) {
             try (Transaction tx = session.beginTransaction()) {
-                tx.run("MATCH (a{id: {fUser} }),(b{id: {sUser} }) MERGE (a)-[r:Friend]->(b)",
+                tx.run("MATCH (a{id: {fUser} }),(b{id: {sUser} }) MERGE (a)-[r:Friend]-(b)",
                         parameters("fUser", firstUserID, "sUser",secondUserID));
                 tx.success();
             }
@@ -44,7 +44,7 @@ public class Main
     public static void addSubscriber(int groupID, int userID) {
         try (Session session = driver.session()){
             try (Transaction tx = session.beginTransaction()){
-                tx.run("MATCH (a{id: {user} }),(b{id: {group} }) MERGE (a)-[r: Subscriber]->(b)",
+                tx.run("MATCH (a{id: {user} }),(b{id: {group} }) MERGE (a)-[r: Subscriber]-(b)",
                         parameters("group", groupID, "user",userID));
                 tx.success();
             }
@@ -60,16 +60,16 @@ public class Main
 
     public String getNameMale(){
         try (Session session = driver.session()) {
-            StatementResult result = session.run("MATCH (n:User) " +
-                    "WHERE n.sex=\"male\" RETURN n.name, n.age ORDER BY n.age DESC, n.name");
+            StatementResult result = session.run("MATCH (n:User {sex:\"male\"}) " +
+                    "RETURN n.name, n.age ORDER BY n.age DESC, n.name");
             return resultToString(result);
         }
     }
 
     public String getFriends(String name){
         try (Session session = driver.session()) {
-            StatementResult result = session.run("MATCH (node:User)<-[:Friend]-(n) " +
-                    "WHERE node.name = {param} RETURN n.name ORDER BY n.name",
+            StatementResult result = session.run("MATCH (node:User {name:$param})-[:Friend]-(n) " +
+                    "RETURN n.name ORDER BY n.name",
                     parameters("param", name));
             return resultToString(result);
         }
@@ -77,8 +77,8 @@ public class Main
 
     public String getFriendsFriends(String name){
         try (Session session = driver.session()) {
-            StatementResult result = session.run("MATCH (node:User)<-[:Friend]-(n)<-[:Friend]-(f) " +
-                    "WHERE node.name = {param} RETURN f.name ORDER BY f.name",
+            StatementResult result = session.run("MATCH (node:User {name:$param})-[:Friend*2]-(f) " +
+                    "RETURN f.name ORDER BY f.name",
                     parameters("param", name));
             return resultToString(result);
         }
@@ -86,7 +86,7 @@ public class Main
 
     public String getNameAndCountFriends(){
         try (Session session = driver.session()) {
-            StatementResult result = session.run("MATCH (n:User)<-[:Friend]-(f) " +
+            StatementResult result = session.run("MATCH (n:User)-[:Friend]-(f) " +
                     "RETURN n.name, COUNT(f) AS counter ORDER BY n.name");
             return resultToString(result);
         }
@@ -101,8 +101,8 @@ public class Main
 
     public String getGroupsByName(String name) {
         try (Session session = driver.session()) {
-            StatementResult result = session.run("MATCH (g:Group)<-[:Subscriber]-(u:User) " +
-                    "WHERE u.name = {param} RETURN g.name ORDER BY g.name",
+            StatementResult result = session.run("MATCH (g:Group)-[:Subscriber]-(u:User{name:$param}) " +
+                    "RETURN g.name ORDER BY g.name",
                     parameters("param", name));
             return resultToString(result);
         }
@@ -110,7 +110,7 @@ public class Main
 
     public String getGroupsAndMemberCount(){
         try (Session session = driver.session()) {
-            StatementResult result = session.run("MATCH (g:Group)<-[:Subscriber]-(u:User) " +
+            StatementResult result = session.run("MATCH (g:Group)-[:Subscriber]-(u:User) " +
                     "RETURN g.name, COUNT(u) ORDER BY COUNT(u) DESC");
             return resultToString(result);
         }
@@ -118,8 +118,8 @@ public class Main
 
     public String getCountGroupsFriendsFriends(String name){
         try (Session session = driver.session()) {
-            StatementResult result = session.run("MATCH (u:User)<-[:Friend*2]-(f:User)-[:Subscriber]->(g:Group) " +
-                    "WHERE u.name={param} RETURN COUNT(g)",
+            StatementResult result = session.run("MATCH (u:User {name:$param})-[:Friend*2]-(f:User)-[:Subscriber]-(g:Group) " +
+                    "RETURN COUNT(g)",
                     parameters("param", name));
             return resultToString(result);
         }
@@ -141,7 +141,6 @@ public class Main
                     parameters("param", num));
             return resultToString(result);
         }
-
     }
 
     public String getNameAndPosts(){
@@ -164,7 +163,7 @@ public class Main
 
     public String getPostsFriendsFriends(String name){
         try (Session session = driver.session()) {
-            StatementResult result = session.run("MATCH (n:User {name:$param})<-[:Friend*2]-(f:User) " +
+            StatementResult result = session.run("MATCH (n:User {name:$param})-[:Friend*2]-(f:User) " +
                             "RETURN f.name, f.posts ORDER BY f.name",
                     parameters("param", name));
             return resultToString(result);
