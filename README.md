@@ -5,3 +5,5 @@
 
 
 Lab3
+
+![alt text](https://raw.githubusercontent.com/ViXLEM/Neo4jDB/master/graph.png)
